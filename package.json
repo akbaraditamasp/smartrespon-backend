@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "test": "bun test --preload ./src/tests/index.ts"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.8.0",
+    "@hono/zod-validator": "^0.5.0",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "argon2": "^0.43.0",
+    "class-transformer": "^0.5.1",
+    "hono": "^4.7.10",
+    "luxon": "^3.6.1",
+    "mysql2": "^3.14.1",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0",
+    "typeorm": "^0.3.24",
+    "zod": "^3.25.28"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/luxon": "^3.6.2"
+  }
+}
