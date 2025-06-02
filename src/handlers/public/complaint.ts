@@ -48,6 +48,14 @@ const complaint = new Hono<App>()
       return c.json({ data: complaint.serialize() });
     }
   )
+  .get("/:id", async (c) => {
+    const complaint = await Complaint.findOneByOrFail({
+      userId: c.var.auth.userId,
+      id: c.req.param("id"),
+    });
+
+    return c.json({ data: complaint });
+  })
   .post("/", validator("form", composeComplaintValidation), async (c) => {
     const { pics, ...data } = await c.req.valid("form");
     const complaint = Complaint.from({ ...data, status: "SENT" });
@@ -56,6 +64,15 @@ const complaint = new Hono<App>()
     await complaint.save();
 
     return c.json({ data: complaint.serialize() });
+  })
+  .get("/", async (c) => {
+    const complaints = await Complaint.find({
+      where: {
+        userId: c.var.auth.userId,
+      },
+    });
+
+    return c.json({ data: complaints.map((item) => item.serialize()) });
   });
 
 export default complaint;

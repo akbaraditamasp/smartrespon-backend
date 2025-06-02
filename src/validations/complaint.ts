@@ -11,17 +11,21 @@ export const composeComplaintValidation = z
     address: z.string().nonempty(),
     "coordinates[latitude]": z.coerce.number(),
     "coordinates[longitude]": z.coerce.number(),
-    "pics[]": z.array(
-      upload({
-        mime: ["image/jpeg", "image/png", "image/webp"],
-        size: 3 * 1024 * 1024,
-      }).or(z.string().uuid())
-    ),
+    "pics[]": z
+      .array(
+        upload({
+          mime: ["image/jpeg", "image/png", "image/webp"],
+          size: 3 * 1024 * 1024,
+        }).or(z.string().uuid())
+      )
+      .optional(),
   })
   .transform(async (data) => {
     const pics = await ComplaintPic.find({
       where: {
-        id: In(data["pics[]"].filter((item) => !(item instanceof Upload))),
+        id: In(
+          (data["pics[]"] || []).filter((item) => !(item instanceof Upload))
+        ),
       },
     });
     return {
@@ -33,7 +37,7 @@ export const composeComplaintValidation = z
         longitude: data["coordinates[longitude]"],
       },
       pics: pics.concat(
-        data["pics[]"]
+        (data["pics[]"] || [])
           .filter((item) => item instanceof Upload)
           .map((item) => {
             const pic = new ComplaintPic();
