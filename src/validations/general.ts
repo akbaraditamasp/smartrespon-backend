@@ -1,6 +1,6 @@
 import Base from "@app-entities/base";
 import Upload from "@app-entities/upload";
-import { BaseEntity, FindOptionsWhere } from "typeorm";
+import { BaseEntity, FindOneOptions, FindOptionsWhere } from "typeorm";
 import { z, ZodString } from "zod";
 
 export const phone = z.string().regex(/^[1-9]\d{7,14}$/, {
@@ -59,14 +59,25 @@ export const uuidEntityParam = <
 >(
   model: M,
   field: T,
-  callback: (validation: ZodString) => ZodString = (validation) => validation
+  options?: {
+    callback?: (validation: ZodString) => ZodString;
+    modelOptions?: FindOneOptions<InstanceType<M>>;
+  }
 ) =>
   z
     .object({
-      entity: callback(z.string().uuid()),
+      entity: options?.callback
+        ? options.callback(z.string().uuid())
+        : z.string().uuid(),
     })
     .transform(async ({ entity: value }, ctx: z.RefinementCtx) => {
-      const entity = await model.findOneBy({ [field]: value });
+      const entity = await model.findOne({
+        ...((options?.modelOptions as FindOneOptions<Base>) || {}),
+        where: {
+          [field]: value,
+          ...((options?.modelOptions as FindOneOptions<Base>) || {}).where,
+        },
+      });
 
       if (!entity) {
         ctx.addIssue({

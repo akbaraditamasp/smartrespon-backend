@@ -1,5 +1,6 @@
 import { Type } from "class-transformer";
 import {
+  BeforeRemove,
   Column,
   Entity,
   JoinColumn,
@@ -31,4 +32,9 @@ export default class ComplaintPic extends Base {
   })
   @JoinColumn()
   public file!: Relation<Upload>;
+
+  @BeforeRemove()
+  public async removeUploaded() {
+    await this.file.remove();
+  }
 }

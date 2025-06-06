@@ -1,7 +1,8 @@
+import { Type } from "class-transformer";
 import {
+  BeforeRemove,
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -10,7 +11,6 @@ import {
 import Base from "./base";
 import ComplaintPic from "./complaint_pic";
 import User from "./user";
-import { Type } from "class-transformer";
 
 @Entity("complaints")
 export default class Complaint extends Base {
@@ -46,4 +46,11 @@ export default class Complaint extends Base {
   @ManyToOne(() => User, (user) => user.complaints)
   @Type(() => User)
   public user!: Relation<User>;
+
+  @BeforeRemove()
+  public async removePics() {
+    for (const pic of this.pics || []) {
+      await pic.remove();
+    }
+  }
 }

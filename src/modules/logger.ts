@@ -5,11 +5,7 @@ export class Log {
   public log: Logger;
 
   private constructor() {
-    this.log = pino(
-      pino.transport({
-        target: "pino-pretty",
-      })
-    );
+    this.log = pino();
   }
 
   public static getInstance() {

@@ -4,10 +4,24 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { TypeORMError } from "typeorm";
 import publicRoute from "./public";
+import auth from "./auth";
+import complaint from "./complaint";
+import { serveStatic } from "hono/bun";
+import stats from "./stats";
 
 const app = new Hono()
   .use(cors())
+  .use("/uploads/*", serveStatic({ root: "./" }))
+  .use("/admin/*", serveStatic({ root: "./" }))
+  .route("/auth", auth)
+  .route("/stats", stats)
+  .route("/complaint", complaint)
   .route("/public", publicRoute)
+  .get("/admin/*", async (c) => {
+    const html = await Bun.file("./admin/index.html").text();
+
+    return c.html(html);
+  })
   .get((c) => c.text("Hello world"));
 
 app.onError(async (err, c) => {

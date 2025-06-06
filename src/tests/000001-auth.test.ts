@@ -1,3 +1,4 @@
+import Admin from "@app-entities/admin";
 import User from "@app-entities/user";
 import app from "@app-handlers/index";
 import { faker } from "@faker-js/faker";
@@ -57,6 +58,49 @@ describe("User Auth", async () => {
 
   test("User logout", async () => {
     const response = await client.public.auth.logout.$delete(
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    expect(response.status).toBe(200);
+  });
+
+  test("Admin login using email", async () => {
+    const response = await client.auth.login.$post({
+      json: {
+        email: "admin@pln.co.id",
+        password: "admin123",
+      },
+    });
+
+    expect(response.status).toBe(200);
+
+    const body: { data: { token: string } } = (await response.json()) as any;
+
+    expect(body.data.token).toBeString();
+
+    token = body.data.token;
+  });
+
+  test("Admin check token", async () => {
+    const response = await client.auth["check"].$get(
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    expect(response.status).toBe(200);
+  });
+
+  test("Admin logout", async () => {
+    const response = await client.auth.logout.$delete(
       {},
       {
         headers: {

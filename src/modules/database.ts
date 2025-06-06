@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { AppDataSource } from "../database";
+import Admin from "@app-entities/admin";
 
 export class Database {
   private static instance: Database;
@@ -16,11 +17,19 @@ export class Database {
   }
 
   public static async boot() {
-    return AppDataSource()
+    await AppDataSource()
       .initialize()
       .then((db) => {
         Database.instance = new Database(db);
       });
+
+    if (!(await Admin.count())) {
+      await Admin.from({
+        email: "admin@pln.co.id",
+        plainPassword: "admin123",
+        fullname: "Administrator",
+      }).save();
+    }
   }
 }
 

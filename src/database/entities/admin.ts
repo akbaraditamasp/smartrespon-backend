@@ -8,12 +8,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import AdminToken from "./admin_token";
 import Base from "./base";
-import Complaint from "./complaint";
-import UserToken from "./user_token";
 
-@Entity("users")
-export default class User extends Base {
+@Entity("admins")
+export default class Admin extends Base {
   @PrimaryGeneratedColumn("uuid")
   public id!: string;
 
@@ -34,9 +33,9 @@ export default class User extends Base {
   })
   public plainPassword!: string;
 
-  @OneToMany(() => UserToken, (token) => token.user)
-  @Type(() => UserToken)
-  public tokens?: UserToken[];
+  @OneToMany(() => AdminToken, (token) => token.user)
+  @Type(() => AdminToken)
+  public tokens?: AdminToken[];
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -46,8 +45,4 @@ export default class User extends Base {
     }
     if (this.email) this.email = this.email.toLowerCase();
   }
-
-  @OneToMany(() => Complaint, (complaint) => complaint.user)
-  @Type(() => Complaint)
-  public complaints?: Complaint[];
 }

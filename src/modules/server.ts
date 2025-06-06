@@ -1,5 +1,8 @@
 import type { Hono } from "hono";
 import log from "./logger";
+import { getIPv4Addresses } from "@app-utils/get-ip";
+import { $ } from "bun";
+import qrcode from "qrcode-terminal";
 
 export class Server {
   private static instance: Server;
@@ -24,7 +27,7 @@ export class Server {
     return this.app;
   }
 
-  public start(app: Hono) {
+  public async start(app: Hono) {
     this.app = app;
 
     Bun.serve({
@@ -32,7 +35,7 @@ export class Server {
       port: 3000,
     });
 
-    log().log.info(`Running on PORT ${this.port}`);
+    log().log.info(`🚀 Server berjalan ngab.`);
   }
 }
 

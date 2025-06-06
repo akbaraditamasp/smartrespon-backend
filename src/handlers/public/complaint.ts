@@ -49,10 +49,30 @@ const complaint = new Hono<App>()
     }
   )
   .get("/:id", async (c) => {
-    const complaint = await Complaint.findOneByOrFail({
-      userId: c.var.auth.userId,
-      id: c.req.param("id"),
+    const complaint = await Complaint.findOneOrFail({
+      where: {
+        userId: c.var.auth.userId,
+        id: c.req.param("id"),
+      },
+      relations: {
+        pics: true,
+      },
     });
+
+    return c.json({ data: complaint });
+  })
+  .delete("/:id", async (c) => {
+    const complaint = await Complaint.findOneOrFail({
+      where: {
+        userId: c.var.auth.userId,
+        id: c.req.param("id"),
+      },
+      relations: {
+        pics: true,
+      },
+    });
+
+    await complaint.remove();
 
     return c.json({ data: complaint });
   })
